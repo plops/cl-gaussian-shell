@@ -138,6 +138,19 @@
 			   (- (/ z (- n 1))))))
 	     54))))))
 
+(let ((z 32))
+ (estimate-continued-fraction
+  (lambda (n)
+    (values (cond ((= n 0) 1)
+		  ((= n 1) (- 2 z))
+		  (t (* 2 (- (* 2 n) 1))))
+	    (if (= n 1)
+		(* 2 z)
+		(expt z 2))))
+  54))
+
+;; https://en.wikipedia.org/wiki/Exponential_function gives faster continued fraction
+
 (defun exp-continued-fraction (z &key (iterstart 2) (itermax 300) (digits 5) (debug nil))
   ;; exponential function ez is an entire function with a power series
   ;; expansion that converges uniformly on every bounded domain in the
