@@ -108,7 +108,26 @@
 #+nil
 (sqrt-babylon 2 :debug t :digits 2000)
 ;; http://en.wikipedia.org/wiki/Generalized_continued_fraction
+;; http://rosettacode.org/wiki/Continued_fraction#C.2B.2B
+(defun estimate-continued-fraction (generator n)
+  (let ((temp 0))
+    (DECLARE (type (or number ratio) temp))
+    (loop for n1 from n downto 1
+       do (multiple-value-bind (a b) 
+	      (funcall generator n1)
+	    (setf temp (/ b (+ a temp)))))
+    (+ (funcall generator 0) temp)))
 
+#+nil
+(format t "sqrt(2) = ~a~%" (estimate-continued-fraction
+			    (lambda (n)
+			      (values (if (> n 0) 2 1) 1)) 10))
+
+
+(estimate-continued-fraction
+ (lambda (n)
+   (let ((z 1/2))
+     (values (if (> n 0) 2 1) 1))) 10)
 
 (defun exp-continued-fraction (z)
   ;; exponential function ez is an entire function with a power series
