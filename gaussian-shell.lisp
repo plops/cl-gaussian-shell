@@ -107,6 +107,20 @@
 
 #+nil
 (sqrt-babylon 2 :debug t :digits 2000)
+;; http://en.wikipedia.org/wiki/Generalized_continued_fraction
+
+
+(defun exp-continued-fraction (z)
+  ;; exponential function ez is an entire function with a power series
+  ;; expansion that converges uniformly on every bounded domain in the
+  ;; complex plane
+  ;; http://en.wikipedia.org/wiki/Euler%27s_continued_fraction_formula
+  (let ((ret 1))
+    (declare (type ratio ret))
+    (setf ))
+  )
+
+(coerce (+ (/ 1 2) (/ 1 2)) 'ratio)
 
 #+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
