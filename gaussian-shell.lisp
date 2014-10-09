@@ -79,13 +79,14 @@
     (loop for m from 1 upto mm and b in binomials sum
 	  (* b 
 	     (expt -1 (- m 1))
-	     (rationalize (sqrt (/ (a2 m delta sigma) 
-				(* m (b2 m delta sigma)))))
+	     (sqrt-babylon (/ (a2 m delta sigma) 
+			      (* m (b2 m delta sigma))))
 	     (rationalize (exp (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
-							    (expt s2x 2)))
-			       (* (d m delta sigma k) (expt (- s1x s2x) 2)))))))))
+						   (expt s2x 2)))
+		      (* (d m delta sigma k) (expt (- s1x s2x) 2)))
+		   ))))))
 #+nil
-(w (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
+(w (/ 3 10) (/ 1 10) 20 (/ 7 10) (/ 4 10) (/ 2))
 #+nil
 (* 1d0 (reduce #'+
 	 (mapcar (lambda (x) (reduce #'* x))
@@ -94,11 +95,12 @@
 ;;(ql:quickload "oct")
 
 
-(defun sqrt-babylon (s &key (itermax 12) (digits 100) (debug nil))
+(defun sqrt-babylon (s &key (itermax 12) (digits 14) (debug nil))
   "use babylonian method (newton iteration) to find the rational approximation of the square root of the number s"
-  (let ((x 2/1))
-    (loop for i below itermax while (< (- digits)
-				       (log (abs (- s (* x x))) 10)) do
+  (let ((x (rationalize (sqrt s))))
+    (loop for i below itermax while (let ((v (abs (- s (* x x)))))
+				      (and (not (= 0d0 v)) (< (- digits)
+							      (log v 10)))) do
 	  
 	  (setf x (* 1/2 (+ x (/ s x))))
 	  (when debug
@@ -106,7 +108,7 @@
     x))
 
 #+nil
-(sqrt-babylon 2 :debug t :digits 2000)
+(sqrt-babylon 2 :debug t :digits 14)
 ;; http://en.wikipedia.org/wiki/Generalized_continued_fraction
 ;; http://rosettacode.org/wiki/Continued_fraction#C.2B.2B
 (defun estimate-continued-fraction (generator n)
@@ -136,7 +138,7 @@
 			   (- (/ z (- n 1))))))
 	     54))))))
 
-(defun exp-continued-fraction (z &key (iterstart 2) (itermax 12) (digits 100) (debug nil))
+(defun exp-continued-fraction (z &key (iterstart 2) (itermax 300) (digits 5) (debug nil))
   ;; exponential function ez is an entire function with a power series
   ;; expansion that converges uniformly on every bounded domain in the
   ;; complex plane
@@ -151,23 +153,28 @@
 			   1
 			   (- (/ z (- n 1))))))
 	     maxn)))
-    (let ((err 100d0))
+    (let ((err 100d0)
+	  (result 0))
+      (declare (type (or number ratio) result))
      (loop for i from iterstart below (+ iterstart itermax) while (< (- digits) err) do
 	  (let ((v
 		 (fun i)))
 	    (setf err (log (abs (- z (log v))) 10))
+	    (setf result v)
 	    (when debug
-	      (format t "~12,12f ~a ~a~%" err (* 1d0 (log v)) v)))))))
-
+	      (format t "~12,12f ~a ~a~%" err (* 1d0 (log v)) v))))
+     result)))
+#+nil
 (progn (terpri)
  (exp-continued-fraction (rationalize 100) :debug t :digits 5 :itermax 300))
 
 #+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
   (let ((mm 30)); loop for mm from 30 upto 30 by 2 do
-	(loop for i from -2500 upto 2500 by 1 do
-	      (let ((v (w (/ i 100) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
-	       (format s "~12,8f ~12,8f~%" (* .01 i) (* 1d0 v))))
+	(loop for i from -250 upto 250 by 1 do
+	      (let ((v (w (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
+	       (format s "~12,8f ~12,8f ~a~%" (* .1 i) (* 1d0 v) v)
+	       (force-output s)))
 	(terpri s)))
 
 #+nil
