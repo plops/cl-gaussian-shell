@@ -81,12 +81,13 @@
 	     (expt -1 (- m 1))
 	     (sqrt-babylon (/ (a2 m delta sigma) 
 			      (* m (b2 m delta sigma))))
-	     (rationalize (exp (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
-						   (expt s2x 2)))
-		      (* (d m delta sigma k) (expt (- s1x s2x) 2)))
-		   ))))))
+	     (exp-continued-fraction2 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+								      (expt s2x 2)))
+					 (* (d m delta sigma k) (expt (- s1x s2x) 2)))
+				      :nmax 300
+		  )))))
 #+nil
-(w (/ 3 10) (/ 1 10) 20 (/ 7 10) (/ 4 10) (/ 2))
+(* 1d0 (w (/ 3 10) (/ 1 10) 20 (/ 7 10) (/ 4 10) (/ 2)))
 #+nil
 (* 1d0 (reduce #'+
 	 (mapcar (lambda (x) (reduce #'* x))
@@ -271,10 +272,10 @@
 
 #+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
-  (let ((mm 30)); loop for mm from 30 upto 30 by 2 do
+  (let ((mm 30)); loop for mm from 50 upto 50 by 2 do
 	(loop for i from -250 upto 250 by 1 do
 	      (let ((v (w (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
-	       (format s "~12,8f ~12,8f ~a~%" (* .1 i) (* 1d0 v) v)
+	       (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
 	       (force-output s)))
 	(terpri s)))
 
