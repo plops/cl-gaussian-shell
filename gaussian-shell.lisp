@@ -95,6 +95,7 @@
 
 
 (defun sqrt-babylon (s &key (itermax 12) (digits 100) (debug nil))
+  "use babylonian method (newton iteration) to find the rational approximation of the square root of the number s"
   (let ((x 2/1))
     (loop for i below itermax while (< (- digits)
 				       (log (abs (- s (* x x))) 10)) do
