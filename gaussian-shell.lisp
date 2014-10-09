@@ -122,30 +122,45 @@
 (format t "sqrt(2) = ~a~%" (estimate-continued-fraction
 			    (lambda (n)
 			      (values (if (> n 0) 2 1) 1)) 10))
+#+nil
+(let ((z (rationalize 30))) 
+  (log (abs (- z 
+	   (log
+	    (estimate-continued-fraction
+	     (lambda (n)
+	       (values (if (< n 2) 
+			   n
+			   (+ 1 (/ z (- n 1))))
+		       (if (= n 1)
+			   1
+			   (- (/ z (- n 1))))))
+	     54))))))
 
-(let ((z (rationalize 10))) (- 
-	 (exp z)
-	 (estimate-continued-fraction
-	  (lambda (n)
-	    (values (if (< n 2) 
-			n
-			(+ 1 (/ z (- n 1))))
-		    (if (= n 1)
-			1
-			(- (/ z (- n 1))))))
-	  32)))
-
-(defun exp-continued-fraction (z)
+(defun exp-continued-fraction (z &key (iterstart 2) (itermax 12) (digits 100) (debug nil))
   ;; exponential function ez is an entire function with a power series
   ;; expansion that converges uniformly on every bounded domain in the
   ;; complex plane
   ;; http://en.wikipedia.org/wiki/Euler%27s_continued_fraction_formula
-  (let ((ret 1))
-    (declare (type ratio ret))
-    (setf ))
-  )
+  (labels ((fun (maxn)
+	    (estimate-continued-fraction
+	     (lambda (n)
+	       (values (if (< n 2) 
+			   n
+			   (+ 1 (/ z (- n 1))))
+		       (if (= n 1)
+			   1
+			   (- (/ z (- n 1))))))
+	     maxn)))
+    (let ((err 100d0))
+     (loop for i from iterstart below (+ iterstart itermax) while (< (- digits) err) do
+	  (let ((v
+		 (fun i)))
+	    (setf err (log (abs (- z (log v))) 10))
+	    (when debug
+	      (format t "~12,12f ~a ~a~%" err (* 1d0 (log v)) v)))))))
 
-(coerce (+ (/ 1 2) (/ 1 2)) 'ratio)
+(progn (terpri)
+ (exp-continued-fraction (rationalize 100) :debug t :digits 5 :itermax 300))
 
 #+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
