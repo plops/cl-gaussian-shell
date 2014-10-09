@@ -84,9 +84,9 @@
 	     (rationalize (exp (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
 							    (expt s2x 2)))
 			       (* (d m delta sigma k) (expt (- s1x s2x) 2)))))))))
-
+#+nil
 (w (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
-
+#+nil
 (* 1d0 (reduce #'+
 	 (mapcar (lambda (x) (reduce #'* x))
 		 (w (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2)))))
@@ -104,9 +104,10 @@
 	   (format t "~12,12f ~12,12f~%" (* 1d0 (abs (- s (* x x)))) (* 1d0 (log (abs (- s (* x x))) 10)))))
     x))
 
+#+nil
 (sqrt-babylon 2 :debug t :digits 2000)
 
-
+#+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
   (let ((mm 30)); loop for mm from 30 upto 30 by 2 do
 	(loop for i from -2500 upto 2500 by 1 do
@@ -114,6 +115,7 @@
 	       (format s "~12,8f ~12,8f~%" (* .01 i) (* 1d0 v))))
 	(terpri s)))
 
+#+nil
 (list
  (mapcar #'second (sort (loop for i from 0 and e in (mapcar #'abs (w .1 .1 30 .7 .4 .5))
 			      and f in (w .2 .1 30 .7 .4 .5)
@@ -121,5 +123,5 @@
  (mapcar #'second (sort (loop for i from 0 and e in (mapcar #'abs (w .1 .1 30 .7 .4 .5))
 			    and f in (w .1 .1 30 .7 .4 .5)
 			    collect (list e f)) #'< :key #'first)))
-
+#+nil
 (sort (w .1 .1 30 .7 .4 .5) #'<)
