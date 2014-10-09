@@ -138,7 +138,43 @@
 			   (- (/ z (- n 1))))))
 	     54))))))
 
-(let ((z 32))
+(defun log* (x)
+  (if (<= x 0d0)
+      nil
+      (log x)))
+
+(let ((z (rationalize (/ 1280 11))))
+  (- (exp (* 1d0 z))
+     (estimate-continued-fraction
+      (lambda (n)
+	(values (cond ((= n 0) 1)
+		      ((= n 1) (- 2 z))
+		      (t (* 2 (- (* 2 n) 1))))
+		(if (= n 1)
+		    (* 2 z)
+		    (expt z 2))))
+      200)))
+
+(defun exp-continued-fraction2 (z &key (nmax 100))
+  (estimate-continued-fraction
+   (lambda (n)
+     (values (cond ((= n 0) 1)
+		   ((= n 1) (- 2 z))
+		   (t (* 2 (- (* 2 n) 1))))
+	     (if (= n 1)
+		 (* 2 z)
+		 (expt z 2))))
+   nmax))
+
+(let ((x (/ 1280 11))
+      (n 399))
+  (* 1d0
+   (abs
+    (-
+     (exp-continued-fraction2 x :nmax (- n 1))
+     (exp-continued-fraction2 x :nmax n)))))
+
+(let ((z (/ 1280 11)))
  (estimate-continued-fraction
   (lambda (n)
     (values (cond ((= n 0) 1)
@@ -147,7 +183,7 @@
 	    (if (= n 1)
 		(* 2 z)
 		(expt z 2))))
-  54))
+  23))
 
 ;; https://en.wikipedia.org/wiki/Exponential_function gives faster continued fraction
 
