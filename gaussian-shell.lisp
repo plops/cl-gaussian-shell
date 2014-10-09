@@ -164,9 +164,61 @@
 	    (when debug
 	      (format t "~12,12f ~a ~a~%" err (* 1d0 (log v)) v))))
      result)))
+
+(defun exp-continued-fraction* (z &key (n 30))
+  (labels ((fun (maxn)
+	     (estimate-continued-fraction
+	      (lambda (n)
+		(values (if (< n 2) 
+			    n
+			    (+ 1 (/ z (- n 1))))
+			(if (= n 1)
+			    1
+			    (- (/ z (- n 1))))))
+	      maxn)))
+    (fun n)))
 #+nil
 (progn (terpri)
  (exp-continued-fraction (rationalize 100) :debug t :digits 5 :itermax 300))
+
+(defun exp-ratio (x &key (itermax 4) (debug nil))
+  (declare (type (or number ratio) z))
+  "starting from the double-float evaluation of the exponential of x, improve the result using a taylor expansion around this double-float point"
+  (let* ((a (rationalize (coerce x 'single-float)))
+	 (fa (rationalize (exp a)))
+	 (d (- x a)))
+    (when debug
+      (format t "DIFF ~a~%" (* 1d0 d)))
+    (when debug
+      (format t "coef: ~{~a~%~}" (loop for i from 0 below itermax collect
+				      (* 1d0 (/ (expt (* a d) i)
+					  (factorial i))))))
+    (* fa
+
+       (loop for i from 0 below itermax sum
+	    (/ (expt (* a d) i)
+	       (factorial i))))))
+
+(rational (log (exp (/ 6 11))))
+
+(- (rational (/ 6 11))
+ (/ 6 11)) 
+
+(let* ((y 35)
+       (x (sqrt-babylon y :digits 100)))
+  ;;(exp-ratio x)
+  
+#+nil
+  (* 1d0 (- x (rationalize (coerce x 'double-float))))
+  
+  (let ((v (exp-ratio x :itermax 13 :debug t)))
+    ;;v #+nil
+    (exp-continued-fraction* x :n 50)
+#+nil
+    (list (* 1d0 (- v (exp-continued-fraction* x :n 50))) (* 1d0 v) (- y (expt (log v) 2)))
+    #+nil(if (= v 0d0) 
+	nil
+	(log v 10))))
 
 #+nil
 (with-open-file (s "/dev/shm/o.dat" :direction :output :if-exists :supersede)
