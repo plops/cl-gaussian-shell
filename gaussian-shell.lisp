@@ -123,11 +123,17 @@
 			    (lambda (n)
 			      (values (if (> n 0) 2 1) 1)) 10))
 
-
-(estimate-continued-fraction
- (lambda (n)
-   (let ((z 1/2))
-     (values (if (> n 0) 2 1) 1))) 10)
+(let ((z (rationalize 10))) (- 
+	 (exp z)
+	 (estimate-continued-fraction
+	  (lambda (n)
+	    (values (if (< n 2) 
+			n
+			(+ 1 (/ z (- n 1))))
+		    (if (= n 1)
+			1
+			(- (/ z (- n 1))))))
+	  32)))
 
 (defun exp-continued-fraction (z)
   ;; exponential function ez is an entire function with a power series
