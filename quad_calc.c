@@ -38,10 +38,13 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
   int i;
   for(i=0;i<M;i++){
     int m=i+1;
-    __float128 a2=sigma*sigma*(2*m*delta*delta+4*sigma*sigma)/(m*delta*delta+4*sigma*sigma),
-      b2=2/(m*delta*delta)+1/(sigma*sigma),
-      c=k*k*sigma*sigma*m*delta*delta/(m*delta*delta+4*sigma*sigma),
-      d=2*k*k*sigma*sigma*sigma*sigma/(m*delta*delta+4*sigma*sigma);
+    __float128 d2=delta*delta,s2=sigma*sigma,
+      div=1.0q/(m*d2+4.0q*s2),
+      a2=s2*(2.0q*m*d2+4.0q*s2)*div,
+      b2=2.0q/(m*d2)+1.0q/s2,
+      k2=k*k,
+      c=k2*s2*m*d2*div,
+      d=2*k2*s2*s2*div;
     sum += binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
   }
   return sum;
@@ -49,7 +52,7 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
 
 int main()
 {
-  enum{M=50};
+  enum{M=30};
   __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
   calc_binomials(M,binom);
   char y[1000];
