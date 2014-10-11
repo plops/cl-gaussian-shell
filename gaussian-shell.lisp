@@ -89,24 +89,30 @@
 
 (defun w-double (s1x s2x mm delta sigma k)
   (let ((binomials (shell-binomials mm)))
-    (list (sort (loop for m from 1 upto mm by 2 collect
-		     (let ((b (elt binomials (- m 1))))
-		       (* b 
-			  (sqrt (* 1d0 (/ (a2 m delta sigma) 
-				    (* m (b2 m delta sigma)))))
-			  (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
-								(expt s2x 2)))
-				   (* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
-		#'<)
-	  (sort (loop for m from 2 upto mm by 2 collect
-		     (let ((b (elt binomials (- m 1))))
-		       (* b 
-			  (sqrt (* 1d0 (/ (a2 m delta sigma) 
-				    (* m (b2 m delta sigma)))))
-			  (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
-								(expt s2x 2)))
-				   (* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
-		#'<))))
+    (let ((l
+	   (list (sort (loop for m from 1 upto mm by 2 collect
+			    (let ((b (elt binomials (- m 1))))
+			      (* b 
+				 (sqrt (* 1d0 (/ (a2 m delta sigma) 
+						 (* m (b2 m delta sigma)))))
+				 (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+									     (expt s2x 2)))
+						(* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
+		       #'<)
+		 (sort (loop for m from 2 upto mm by 2 collect
+			    (let ((b (elt binomials (- m 1))))
+			      (* b 
+				 (sqrt (* 1d0 (/ (a2 m delta sigma) 
+						 (* m (b2 m delta sigma)))))
+				 (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+									     (expt s2x 2)))
+						(* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
+		       #'<))))
+      (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B))))))))
+
+#+nil (LET ((L (w-double (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))))
+  (- (w (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
+     (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B)))))))
 
 (defun w-double-even-odd (s1x s2x mm delta sigma k)
   (let ((binomials (shell-binomials mm)))
@@ -128,9 +134,7 @@
 								(expt s2x 2)))
 				   (* (d m delta sigma k) (expt (- s1x s2x) 2)))))))))))
 
-(LET ((L (w-double (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))))
-  (- (w (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
-     (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B)))))))
+
 #+nil
 (-
  (w-double-even-odd (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
@@ -323,10 +327,10 @@
 	(log v 10))))
 
 #+nil
-(with-open-file (s "/home/martin/cl-gaussian-shell/M30_double.dat" :direction :output :if-exists :supersede)
-  (let ((mm 50)); loop for mm from 30 upto 30 by 2 do
+(with-open-file (s "/home/martin/cl-gaussian-shell/M50_double_sort.dat" :direction :output :if-exists :supersede)
+  (let ((mm 50)); loop for mm from 50 upto 50 by 2 do
 	(loop for i from -250 upto 250 by 1 do
-	      (let ((v (w-double-even-odd (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
+	      (let ((v (w-double (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
 	       (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
 	       (force-output s)))
 	(terpri s)))
