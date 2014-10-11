@@ -110,9 +110,24 @@
 		       #'<))))
       (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B))))))))
 
-#+nil (LET ((L (w-double (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))))
-  (- (w (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
-     (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B)))))))
+(defun w-double-sort-no-split (s1x s2x mm delta sigma k)
+  (let ((binomials (shell-binomials mm)))
+    (let ((l
+	   (sort (loop for m from 1 upto mm by 1 collect
+		      (let ((b (elt binomials (- m 1))))
+			(* b 
+			   (expt -1 (- m 1))
+			   (sqrt (* 1d0 (/ (a2 m delta sigma) 
+					   (* m (b2 m delta sigma)))))
+			   (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+								       (expt s2x 2)))
+					  (* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
+		 #'<)))
+      (REDUCE #'+ 
+	      (SORT l (LAMBDA (A B) (< (ABS A) (ABS B))))))))
+
+#+nil (w-double-sort (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
+
 
 (defun w-double-even-odd (s1x s2x mm delta sigma k)
   (let ((binomials (shell-binomials mm)))
@@ -328,10 +343,10 @@
 
 #+nil
 (let ((mm 50))
- (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d.dat" mm) 
+ (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d_double_sort_no_split.dat" mm) 
 		    :direction :output :if-exists :supersede)
    (loop for i from -250 upto 250 by 1 do
-	(let ((v (w (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
+	(let ((v (w-double-sort-no-split (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
 	  (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
 	  (force-output s)))
    (terpri s)))
