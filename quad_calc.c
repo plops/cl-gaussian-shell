@@ -41,7 +41,9 @@ int main()
   int i;
   for(i=0;i<M;i++){
     int m=i+1;
-    quadmath_snprintf(y, 1000, "%Qf", binom[i]*powq(-1.0q,m-1));
+    __float128 a2=sigma*sigma*(2*m*delta*delta+4*sigma*sigma)/(m*delta*delta+4*sigma*sigma),
+      b2=2/(m*delta*delta)+1/(sigma*sigma);
+    quadmath_snprintf(y, 1000, "%Qf", binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2)));
     printf("%s\n",y);
   }
   return 0;
