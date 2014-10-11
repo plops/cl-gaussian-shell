@@ -81,7 +81,7 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
 
 int main()
 {
-  enum{M=30};
+  enum{M=50};
   __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
   calc_binomials(M,binom);
   char y[1000];
