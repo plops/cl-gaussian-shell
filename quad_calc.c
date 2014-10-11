@@ -32,12 +32,9 @@ calc_binomials(int M,__float128*a)
 // s1x s2x mm delta sigma k
 // (w-double-even-odd (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
 
-int main()
+__float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 delta, __float128 sigma, __float128 k)
 {
-  enum{M=30};
-  __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
-  calc_binomials(M,binom);
-  char y[1000];
+  __float128 sum=.0q;
   int i;
   for(i=0;i<M;i++){
     int m=i+1;
@@ -47,7 +44,16 @@ int main()
       d=2*k*k*sigma*sigma*sigma*sigma/(m*delta*delta+4*sigma*sigma);
     sum += binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
   }
-    quadmath_snprintf(y, 1000, "%Qf", sum);
-    printf("%s\n",y);
+  return sum;
+}
+
+int main()
+{
+  enum{M=30};
+  __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
+  calc_binomials(M,binom);
+  char y[1000];
+  quadmath_snprintf(y, 1000, "%Qf", w(M,binom,s1x,s2x,delta,sigma,k));
+  printf("%s\n",y);
   return 0;
 }
