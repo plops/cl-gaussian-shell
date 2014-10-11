@@ -29,15 +29,19 @@ calc_binomials(int M,__float128*a)
   }
 }
 
+// s1x s2x mm delta sigma k
+// (w-double-even-odd (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
+
 int main()
 {
-  enum{M=12};
-  __float128 a[M];
-  calc_binomials(M,a);
+  enum{M=30};
+  __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5;
+  calc_binomials(M,binom);
   char y[1000];
   int i;
   for(i=0;i<M;i++){
-    quadmath_snprintf(y, 1000, "%Qf", a[i]);
+    int m=i+1;
+    quadmath_snprintf(y, 1000, "%Qf", binom[i]*powq(-1.0q,m-1));
     printf("%s\n",y);
   }
   return 0;
