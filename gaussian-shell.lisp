@@ -327,13 +327,14 @@
 	(log v 10))))
 
 #+nil
-(with-open-file (s "/home/martin/cl-gaussian-shell/M50_double_sort.dat" :direction :output :if-exists :supersede)
-  (let ((mm 50)); loop for mm from 50 upto 50 by 2 do
-	(loop for i from -250 upto 250 by 1 do
-	      (let ((v (w-double (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
-	       (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
-	       (force-output s)))
-	(terpri s)))
+(let ((mm 50))
+ (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d.dat" mm) 
+		    :direction :output :if-exists :supersede)
+   (loop for i from -250 upto 250 by 1 do
+	(let ((v (w (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
+	  (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
+	  (force-output s)))
+   (terpri s)))
 
 #+nil
 (list
