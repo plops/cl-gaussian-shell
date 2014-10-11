@@ -19,7 +19,7 @@
   (/ (factorial n)
      (* (factorial k) (factorial (- n k)))))
 
-(nchoosek 50 2)
+(nchoosek 50 1)
 
 (- (nchoosek 60 20)
    (nchoosek-d 60d0 20d0))
