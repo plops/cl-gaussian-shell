@@ -114,7 +114,7 @@
 
 (defun w-double-sort-no-split (s1x s2x mm delta sigma k)
   (let ((binomials (shell-binomials mm)))
-    (let ((l
+    (let* ((l
 	   (sort (loop for m from 1 upto mm by 1 collect
 		      (let ((b (elt binomials (- m 1))))
 			(* b 
@@ -124,11 +124,13 @@
 			   (exp (* 1d0 (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
 								       (expt s2x 2)))
 					  (* (d m delta sigma k) (expt (- s1x s2x) 2))))))))
-		 #'<)))
-      (REDUCE #'+ 
-	      (SORT l (LAMBDA (A B) (< (ABS A) (ABS B))))))))
+		 #'<))
+	  (ls (SORT l (LAMBDA (A B) (< (ABS A) (ABS B))))))
+      (values (REDUCE #'+ ls) (* double-float-epsilon (first (last ls)))) 
+      )))
 
-#+nil (w-double-sort (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
+#+nil 
+(w-double-sort-no-split (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
 
 
 (defun w-double-even-odd (s1x s2x mm delta sigma k)
@@ -348,9 +350,9 @@
  (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d_double_sort_no_split.dat" mm) 
 		    :direction :output :if-exists :supersede)
    (loop for i from -250 upto 250 by 1 do
-	(let ((v (w-double-sort-no-split (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
-	  (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
-	  (force-output s)))
+	(multiple-value-bind (v err) (w-double-sort-no-split (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))
+	 (format s "~12,8f ~12,8f ~12,8f ~12,8f% ~%" (* .1 i) (* 1d0 v) (* 1d0 err) (* 100 (abs (/ err v))))
+	 (force-output s)))
    (terpri s)))
 
 #+nil
