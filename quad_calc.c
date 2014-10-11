@@ -62,14 +62,18 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
       res[i]*=-1.0q;
   }
   qsort((void*)res,M,sizeof(__float128),compar);
+  __float128 err=res[M-1]*FLT128_EPSILON;
+  char str[1000];
+  quadmath_snprintf(str, 1000, "%12.8Qf",  log10q(err));
+  fprintf(stderr,"log10q(err[%12.8f]) = %s\n",(double)s1x,str);
   __float128 S=res[0], C=0.0q; // Kahan summation into S
   for(i=1;i<M;i++){
     __float128 Y=res[i]-C, 
       T=S+Y; // Alas, S is big, Y small, so low-order digits of Y are lost.
     C=(T-S)-Y; // T-S recovers the high order part of Y, subtracting Y gives the low order part
-    char str[1000];
+  
     { //if(C!=0.0q && C!=-0.0q){
-      quadmath_snprintf(str, 1000, "%Qf", res[i]);
+      quadmath_snprintf(str, 1000, "%%12.8Qf", res[i]);
       fprintf(stderr,"val = %s\n",str);
     }
   
