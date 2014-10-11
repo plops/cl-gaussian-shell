@@ -344,11 +344,11 @@
 	(log v 10))))
 
 #+nil
-(let ((mm 50))
- (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d_double_sort_no_split.dat" mm) 
+(let ((mm 30))
+ (with-open-file (s (format nil "/home/martin/cl-gaussian-shell/M~d.dat" mm) 
 		    :direction :output :if-exists :supersede)
    (loop for i from -250 upto 250 by 1 do
-	(let ((v (w-double-sort-no-split (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
+	(let ((v (w (/ i 10) (/ 10) mm (/ 7 10) (/ 4 10) (/ 2))))
 	  (format s "~12,8f ~12,8f~%" (* .1 i) (* 1d0 v))
 	  (force-output s)))
    (terpri s)))
