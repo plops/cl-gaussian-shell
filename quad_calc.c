@@ -35,7 +35,7 @@ calc_binomials(int M,__float128*a)
 int main()
 {
   enum{M=30};
-  __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5;
+  __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
   calc_binomials(M,binom);
   char y[1000];
   int i;
@@ -45,8 +45,9 @@ int main()
       b2=2/(m*delta*delta)+1/(sigma*sigma),
       c=k*k*sigma*sigma*m*delta*delta/(m*delta*delta+4*sigma*sigma),
       d=2*k*k*sigma*sigma*sigma*sigma/(m*delta*delta+4*sigma*sigma);
-    quadmath_snprintf(y, 1000, "%Qf", binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2)));
-    printf("%s\n",y);
+    sum += binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
   }
+    quadmath_snprintf(y, 1000, "%Qf", sum);
+    printf("%s\n",y);
   return 0;
 }
