@@ -86,6 +86,36 @@
 					 (* (d m delta sigma k) (expt (- s1x s2x) 2)))
 				      :nmax 300
 		  )))))
+
+(defun w-double (s1x s2x mm delta sigma k)
+  (let ((binomials (shell-binomials mm)))
+    (list (sort (loop for m from 1 upto mm by 2 collect
+		     (let ((b (elt binomials (- m 1))))
+		       (* b 
+			  (sqrt (/ (a2 m delta sigma) 
+				   (* m (b2 m delta sigma))))
+			  (exp (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+							       (expt s2x 2)))
+				  (* (d m delta sigma k) (expt (- s1x s2x) 2)))))))
+		#'<)
+	  (sort (loop for m from 2 upto mm by 2 collect
+		     (let ((b (elt binomials (- m 1))))
+		       (* b 
+			  (sqrt (/ (a2 m delta sigma) 
+				   (* m (b2 m delta sigma))))
+			  (exp (- (* -1 (c m delta sigma k) (+ (expt s1x 2)
+							       (expt s2x 2)))
+				  (* (d m delta sigma k) (expt (- s1x s2x) 2)))))))
+		#'<))))
+(LET ((L (w-double (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))))
+  (REDUCE #'+ (SORT (MAPCAR #'- (FIRST L) (SECOND L)) (LAMBDA (A B) (< (ABS A) (ABS B))))))
+#+nil
+(list
+ (w-double (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
+ (* 1d0 (w (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))))
+#+nil
+(-  (w (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2))
+    (w-double (/ 3 10) (/ 1 10) 30 (/ 7 10) (/ 4 10) (/ 2)))
 #+nil
 (* 1d0 (w (/ 3 10) (/ 1 10) 20 (/ 7 10) (/ 4 10) (/ 2)))
 #+nil
@@ -232,7 +262,7 @@
  (exp-continued-fraction (rationalize 100) :debug t :digits 5 :itermax 300))
 
 (defun exp-ratio (x &key (itermax 4) (debug nil))
-  (declare (type (or number ratio) z))
+  (declare (type (or number ratio) x))
   "starting from the double-float evaluation of the exponential of x, improve the result using a taylor expansion around this double-float point"
   (let* ((a (rationalize (coerce x 'single-float)))
 	 (fa (rationalize (exp a)))
