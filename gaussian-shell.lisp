@@ -46,7 +46,7 @@
      (/ (expt sigma 2))))
 
 (defun c (m delta sigma k)
-  (/ (expt (* k sigma m delta) 2)
+  (/ (* m (expt (* k sigma delta) 2))
      (+ (* m (expt delta 2))
 	(* 4 (expt sigma 2)))))
 

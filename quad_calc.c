@@ -57,7 +57,9 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
       k2=k*k,
       c=k2*s2*m*d2*div,
       d=2*k2*s2*s2*div;
-    res[i]= binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
+    res[i]= binom[i]*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
+    if(m%2==0)
+      res[i]*=-1.0q;
   }
   qsort((void*)res,M,sizeof(__float128),compar);
   __float128 S=res[0], C=0.0q; // Kahan summation into S
@@ -68,7 +70,7 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
     char str[1000];
     { //if(C!=0.0q && C!=-0.0q){
       quadmath_snprintf(str, 1000, "%Qf", res[i]);
-      fprintf(stdout,"val = %s\n",str);
+      fprintf(stderr,"val = %s\n",str);
     }
   
     S=T;
