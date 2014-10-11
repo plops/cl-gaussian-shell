@@ -49,9 +49,14 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
   }
   __float128 S=res[0], C=0.0q; // Kahan summation into S
   for(i=1;i<M;i++){
-    __float128 Y=res[i]-C,
-      T=S+Y;
-    C=(T-S)-Y;
+    __float128 Y=res[i]-C, 
+      T=S+Y; // Alas, S is big, Y small, so low-order digits of Y are lost.
+    C=(T-S)-Y; // T-S recovers the high order part of Y, subtracting Y gives the low order part
+    char str[1000];
+    if(C!=0.0q && C!=-0.0q){
+      quadmath_snprintf(str, 1000, "%Qf", log10q(C));
+      printf("C=%s\n",str);
+    }
     S=T;
   }
   return S;
