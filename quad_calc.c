@@ -34,7 +34,7 @@ calc_binomials(int M,__float128*a)
 
 __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 delta, __float128 sigma, __float128 k)
 {
-  __float128 sum=.0q;
+  __float128 res[M];
   int i;
   for(i=0;i<M;i++){
     int m=i+1;
@@ -45,14 +45,21 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
       k2=k*k,
       c=k2*s2*m*d2*div,
       d=2*k2*s2*s2*div;
-    sum += binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
+    res[i]= binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
   }
-  return sum;
+  __float128 S=res[0], C=0.0q; // Kahan summation into S
+  for(i=1;i<M;i++){
+    __float128 Y=res[i]-C,
+      T=S+Y;
+    C=(T-S)-Y;
+    S=T;
+  }
+  return S;
 }
 
 int main()
 {
-  enum{M=30};
+  enum{M=50};
   __float128 binom[M],s1x=.3,s2x=.1,delta=.7,sigma=.4,k=.5,sum=.0q;
   calc_binomials(M,binom);
   char y[1000];
