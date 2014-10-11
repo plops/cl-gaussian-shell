@@ -35,7 +35,7 @@ calc_binomials(int M,__float128*a)
 
 int compar(const void*a,const void*b)
 {
-  __float128 p=*((__float128*)a),q=*((__float128*)b), pp=abs(p),qq=abs(q);
+  __float128 p=*((__float128*)a),q=*((__float128*)b), pp=fabsq(p),qq=fabsq(q);
   if(pp<qq)
     return -1;
   else if(pp==qq)
@@ -68,7 +68,7 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
     char str[1000];
     { //if(C!=0.0q && C!=-0.0q){
       quadmath_snprintf(str, 1000, "%Qf", res[i]);
-      fprintf(stderr,"val = %s\n",str);
+      fprintf(stdout,"val = %s\n",str);
     }
   
     S=T;
