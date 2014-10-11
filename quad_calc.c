@@ -1,5 +1,6 @@
 #include <quadmath.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 __uint128_t factorial(__uint128_t n, __uint128_t acc)
 {
@@ -32,6 +33,17 @@ calc_binomials(int M,__float128*a)
 // s1x s2x mm delta sigma k
 // (w-double-even-odd (/ 3 10) (/ 1 10) 40 (/ 7 10) (/ 4 10) (/ 2))
 
+int compar(const void*a,const void*b)
+{
+  __float128 p=*((__float128*)a),q=*((__float128*)b), pp=abs(p),qq=abs(q);
+  if(pp<qq)
+    return -1;
+  else if(pp==qq)
+    return 0;
+  else
+    return 1;
+}
+
 __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 delta, __float128 sigma, __float128 k)
 {
   __float128 res[M];
@@ -47,18 +59,21 @@ __float128 w(int M,__float128*binom,__float128 s1x,__float128 s2x, __float128 de
       d=2*k2*s2*s2*div;
     res[i]= binom[i]*powq(-1.0q,m-1)*sqrtq(a2/(m*b2))*expq(-c*(s1x*s1x+s2x*s2x)-d*powq(s1x-s2x,2));
   }
+  qsort((void*)res,M,sizeof(__float128),compar);
   __float128 S=res[0], C=0.0q; // Kahan summation into S
   for(i=1;i<M;i++){
     __float128 Y=res[i]-C, 
       T=S+Y; // Alas, S is big, Y small, so low-order digits of Y are lost.
     C=(T-S)-Y; // T-S recovers the high order part of Y, subtracting Y gives the low order part
     char str[1000];
-    if(C!=0.0q && C!=-0.0q){
-      quadmath_snprintf(str, 1000, "%Qf", log10q(C));
-      printf("C=%s\n",str);
+    { //if(C!=0.0q && C!=-0.0q){
+      quadmath_snprintf(str, 1000, "%Qf", res[i]);
+      fprintf(stderr,"val = %s\n",str);
     }
+  
     S=T;
   }
+  fprintf(stderr,"\n");
   return S;
 }
 
